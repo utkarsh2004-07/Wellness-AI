@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create PWA Icons</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+        gradient.addColorStop(0, '#8b5cf6');
+        gradient.addColorStop(0.5, '#06b6d4');
+        gradient.addColorStop(1, '#f59e0b');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 512, 512);
+        
+        // Add rounded corners
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 512, 512, 80);
+        ctx.fill();
+        
+        // Add emoji
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.font = '200px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'white';
+        ctx.fillText('✨', 256, 256);
+        
+        // Download different sizes
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        sizes.forEach(size => {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(canvas, 0, 0, size, size);
+            
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = tempCanvas.toDataURL();
+            link.click();
+        });
+    </script>
+</body>
+</html>
