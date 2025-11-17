@@ -28,9 +28,14 @@ export default function PWAInstallButton() {
     window.addEventListener('beforeinstallprompt', handler);
     window.addEventListener('appinstalled', installHandler);
 
-    // Show button on localhost for testing
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      setShowInstall(true);
+    // For HTTPS sites, check if PWA criteria are met
+    if (window.location.protocol === 'https:' && 'serviceWorker' in navigator) {
+      // Wait a bit for the beforeinstallprompt event
+      setTimeout(() => {
+        if (!deferredPrompt && !isInstalled) {
+          setShowInstall(true); // Show button even without prompt on HTTPS
+        }
+      }, 2000);
     }
 
     return () => {
@@ -52,16 +57,18 @@ export default function PWAInstallButton() {
       } catch (error) {
         console.log('Install prompt failed');
       }
-    } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      // For localhost, show browser-specific instructions
-      const isChrome = /Chrome/.test(navigator.userAgent);
-      const isEdge = /Edg/.test(navigator.userAgent);
-      
-      if (isChrome || isEdge) {
-        // Try to trigger install via browser menu
-        console.log('PWA install available in browser menu');
-        // Hide the button since user needs to use browser menu
-        setShowInstall(false);
+    } else {
+      // For HTTPS without prompt, try to trigger install
+      if (window.location.protocol === 'https:') {
+        // Check if browser supports install
+        if ('BeforeInstallPromptEvent' in window) {
+          // Wait for potential delayed prompt
+          setTimeout(() => {
+            if (deferredPrompt) {
+              deferredPrompt.prompt();
+            }
+          }, 100);
+        }
       }
     }
   };
