@@ -23,8 +23,10 @@ export async function POST(request) {
     }
 
     await connectDB();
+    console.log('MongoDB connected for signup');
     
     const existingUser = await User.findOne({ email: email.toLowerCase() });
+    console.log('Existing user check:', !!existingUser);
     if (existingUser) {
       return NextResponse.json(
         { error: 'User already exists' },
@@ -42,9 +44,10 @@ export async function POST(request) {
 
     await user.save();
 
+    const jwtSecret = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'wellness-ai-super-secret-key-2024-production';
     const token = jwt.sign(
       { userId: user._id },
-      process.env.NEXTAUTH_SECRET,
+      jwtSecret,
       { expiresIn: '7d' }
     );
 

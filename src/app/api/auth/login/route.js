@@ -16,8 +16,10 @@ export async function POST(request) {
     }
 
     await connectDB();
+    console.log('MongoDB connected for login');
     
     const user = await User.findOne({ email: email.toLowerCase() });
+    console.log('User found:', !!user);
     if (!user) {
       return NextResponse.json(
         { error: 'Invalid credentials' },
@@ -33,9 +35,10 @@ export async function POST(request) {
       );
     }
 
+    const jwtSecret = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'wellness-ai-super-secret-key-2024-production';
     const token = jwt.sign(
       { userId: user._id },
-      process.env.NEXTAUTH_SECRET,
+      jwtSecret,
       { expiresIn: '7d' }
     );
 

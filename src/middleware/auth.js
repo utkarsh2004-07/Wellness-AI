@@ -11,7 +11,8 @@ export async function verifyToken(req) {
       return { error: 'No token provided' };
     }
 
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+    const jwtSecret = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'wellness-ai-super-secret-key-2024-production';
+    const decoded = jwt.verify(token, jwtSecret);
     await connectDB();
     
     const user = await User.findById(decoded.userId);
@@ -33,7 +34,8 @@ export async function verifyAdmin(req) {
       return { error: 'No token provided' };
     }
 
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+    const jwtSecret = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'wellness-ai-super-secret-key-2024-production';
+    const decoded = jwt.verify(token, jwtSecret);
     await connectDB();
     
     const admin = await Admin.findById(decoded.adminId);
